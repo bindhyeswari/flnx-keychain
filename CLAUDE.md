@@ -1,5 +1,9 @@
 # CLAUDE.md — keychain-touch-id
 
+## Workflow Rules
+
+- **Check permissions before asking.** Before prompting the user for tool access, read `.claude/settings.local.json` to verify whether the permission is already granted. Never ask for access that is already configured. This is a remote session — the user cannot approve interactive prompts mid-run.
+
 ## Project Overview
 macOS Keychain access with Touch ID biometric confirmation. Single npm package combining TypeScript (library + CLI) with a native Swift binary. Zero runtime dependencies.
 
