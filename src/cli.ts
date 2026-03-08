@@ -8,7 +8,7 @@ import {
   AuthCancelledError,
 } from "./errors.ts";
 
-const USAGE = `Usage: keychain-touch-id <command> <service> [options]
+const USAGE = `Usage: flnx-keychain <command> <service> [options]
 
 Commands:
   set <service>     Store a secret in the Keychain
@@ -76,7 +76,7 @@ async function main() {
   const service = args[1];
 
   if (!service) {
-    die(`Missing service argument. Run 'keychain-touch-id --help' for usage.`, 3);
+    die(`Missing service argument. Run 'flnx-keychain --help' for usage.`, 3);
   }
 
   const { values } = parseArgs({
@@ -137,7 +137,7 @@ async function main() {
       }
 
       default:
-        die(`Unknown command: ${command}. Run 'keychain-touch-id --help' for usage.`, 3);
+        die(`Unknown command: ${command}. Run 'flnx-keychain --help' for usage.`, 3);
     }
   } catch (err) {
     if (err instanceof ItemNotFoundError) {

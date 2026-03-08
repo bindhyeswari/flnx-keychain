@@ -1,10 +1,10 @@
-# TASKS.md — keychain-touch-id
+# TASKS.md — @flnx/keychain
 
 ## Current Tasks
 
 ### Publishing Prep
 - [ ] **Verify on macOS** — Build and run full test suite on macOS to confirm Swift compilation and keychain integration
-- [ ] **Check npm name** — Confirm `keychain-touch-id` is available on npm; scope if taken
+- [ ] **Check npm name** — Confirm `@flnx/keychain` is available on npm; scope if taken
 - [ ] **Dry run** — Run `npm pack --dry-run` to verify tarball contents (dist/, native/, scripts/, bin/)
 - [ ] **npm login & publish** — Authenticate and run `npm publish`
 - [ ] **Post-publish smoke test** — Install from npm in a fresh project on macOS, verify set/get/delete/has

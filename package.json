@@ -1,12 +1,12 @@
 {
-  "name": "keychain-touch-id",
+  "name": "@flnx/keychain",
   "version": "0.1.0",
   "description": "macOS Keychain access with Touch ID biometric confirmation",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "keychain-touch-id": "dist/cli.js"
+    "flnx-keychain": "dist/cli.js"
   },
   "files": [
     "dist/",

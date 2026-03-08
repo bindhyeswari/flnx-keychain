@@ -1,4 +1,4 @@
-# keychain-touch-id
+# @flnx/keychain
 
 macOS Keychain access with Touch ID biometric confirmation. Store, retrieve, and manage secrets with optional biometric authentication.
 
@@ -16,7 +16,7 @@ macOS Keychain access with Touch ID biometric confirmation. Store, retrieve, and
 ## Install
 
 ```bash
-npm install keychain-touch-id
+npm install @flnx/keychain
 ```
 
 The Swift helper binary compiles from source during `postinstall`. This requires Xcode Command Line Tools.
@@ -24,7 +24,7 @@ The Swift helper binary compiles from source during `postinstall`. This requires
 ## API
 
 ```typescript
-import { setSecret, getSecret, hasSecret, deleteSecret } from "keychain-touch-id";
+import { setSecret, getSecret, hasSecret, deleteSecret } from "@flnx/keychain";
 
 // Store a secret with Touch ID protection
 await setSecret("ghp_abc123...", {
@@ -65,7 +65,7 @@ await deleteSecret({ service: "com.myapp.github-token" });
 ### Error Handling
 
 ```typescript
-import { AuthCancelledError, ItemNotFoundError } from "keychain-touch-id";
+import { AuthCancelledError, ItemNotFoundError } from "@flnx/keychain";
 
 try {
   const secret = await getSecret({ service: "com.myapp.token" });
@@ -91,19 +91,19 @@ try {
 
 ```bash
 # Store interactively (prompts for secret)
-keychain-touch-id set com.myapp.token --biometric --reason "Unlock API key"
+flnx-keychain set com.myapp.token --biometric --reason "Unlock API key"
 
 # Store from pipe
-echo "ghp_abc123" | keychain-touch-id set com.myapp.token --biometric
+echo "ghp_abc123" | flnx-keychain set com.myapp.token --biometric
 
 # Retrieve (prints to stdout)
-TOKEN=$(keychain-touch-id get com.myapp.token)
+TOKEN=$(flnx-keychain get com.myapp.token)
 
 # Check existence (exit code 0 = exists, 1 = not found)
-keychain-touch-id has com.myapp.token
+flnx-keychain has com.myapp.token
 
 # Delete
-keychain-touch-id delete com.myapp.token
+flnx-keychain delete com.myapp.token
 ```
 
 ### Exit Codes
