@@ -1,0 +1,36 @@
+{
+  "name": "keychain-touch-id",
+  "version": "0.1.0",
+  "description": "macOS Keychain access with Touch ID biometric confirmation",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "keychain-touch-id": "dist/cli.js"
+  },
+  "files": [
+    "dist/",
+    "native/",
+    "scripts/",
+    "bin/"
+  ],
+  "scripts": {
+    "build:swift": "bash scripts/build-swift.sh",
+    "build:ts": "bun build src/index.ts src/cli.ts --outdir dist --target node",
+    "build": "bun run build:swift && bun run build:ts",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "postinstall": "bash scripts/build-swift.sh",
+    "prepublishOnly": "bun run build",
+    "prepack": "bash scripts/prepack.sh"
+  },
+  "os": ["darwin"],
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/bun": "latest"
+  }
+}
