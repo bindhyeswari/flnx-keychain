@@ -2,11 +2,13 @@
 
 ## Current Tasks
 
-- [ ] **Scaffold the project** — Create `package.json`, `tsconfig.json`, `.gitignore`
-- [ ] **Build the Swift binary** — Create `native/keychain-helper/` with `Package.swift` and `Sources/main.swift`
-- [ ] **Implement TypeScript layer** — Types (`types.ts`), errors (`errors.ts`), keychain bridge (`keychain.ts`), library entry point (`index.ts`)
-- [ ] **Build the CLI** — Implement `src/cli.ts` with `set`, `get`, `delete`, `has` commands
-- [ ] **Add build scripts** — `scripts/build-swift.sh`, `scripts/prepack.sh`, wire up `package.json` scripts
-- [ ] **Write tests** — Unit tests for TS layer, integration tests for full flow
+_(none — all initial tasks complete)_
 
 ## Completed Tasks
+
+- [x] **Scaffold the project** — Created `package.json`, `tsconfig.json`, `.gitignore`
+- [x] **Build the Swift binary** — Created `native/keychain-helper/` with `Package.swift` and `Sources/main.swift`
+- [x] **Implement TypeScript layer** — Types (`types.ts`), errors (`errors.ts`), keychain bridge (`keychain.ts`), library entry point (`index.ts`)
+- [x] **Build the CLI** — Implemented `src/cli.ts` with `set`, `get`, `delete`, `has` commands
+- [x] **Add build scripts** — `scripts/build-swift.sh`, `scripts/prepack.sh`, wired up `package.json` scripts
+- [x] **Write tests** — Unit tests for error hierarchy, keychain module platform checks, CLI argument parsing
