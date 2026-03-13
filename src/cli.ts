@@ -17,12 +17,13 @@ Commands:
   delete <service>  Remove a secret from the Keychain
   has <service>     Check if a secret exists
   exec -- <cmd>     Run command with secrets as env vars
+  env               Output secrets as export statements (pipe to eval)
 
 Options:
   --account <name>   Keychain account label (default: "default")
   --biometric        Require Touch ID to access this item
   --reason <text>    Message shown in the Touch ID dialog
-  --config <path>    Config file for exec command (default: .keychain.json)
+  --config <path>    Config file for exec/env commands (default: .keychain.json)
   --help             Show this help message`;
 
 function die(message: string, code: number): never {
@@ -138,6 +139,49 @@ async function main() {
 
       const code = await child.exited;
       process.exit(code);
+    } catch (err) {
+      if (err instanceof ItemNotFoundError) {
+        die(err.message, 1);
+      } else if (err instanceof AuthFailedError || err instanceof AuthCancelledError) {
+        die(err.message, 2);
+      } else if (err instanceof KeychainError) {
+        die(err.message, 3);
+      }
+      throw err;
+    }
+  }
+
+  // env command outputs export statements
+  if (command === "env") {
+    const { values } = parseArgs({
+      args: args.slice(1),
+      options: {
+        config: { type: "string" },
+      },
+      strict: false,
+      allowPositionals: true,
+    });
+
+    const configPath = (values.config as string | undefined) ?? ".keychain.json";
+    const config = await loadExecConfig(configPath);
+
+    try {
+      // Biometric gate if configured
+      if (config.biometric) {
+        await authenticate("Access secrets");
+      }
+
+      // Fetch and output as export statements
+      for (const [envVar, account] of Object.entries(config.secrets)) {
+        const value = await getSecret({
+          service: config.service,
+          account,
+        });
+        // Escape single quotes in value
+        const escaped = value.replace(/'/g, "'\"'\"'");
+        process.stdout.write(`export ${envVar}='${escaped}'\n`);
+      }
+      process.exit(0);
     } catch (err) {
       if (err instanceof ItemNotFoundError) {
         die(err.message, 1);

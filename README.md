@@ -133,12 +133,23 @@ echo "postgres://..." | flnx-keychain set myapp --account db-url
 ```
 
 **3. Run with secrets injected:**
+
 ```bash
+# Option A: Direct execution (spawns child process)
 flnx-keychain exec -- npm start
-flnx-keychain exec --config ./other.keychain.json -- bun run dev
+
+# Option B: Pipe to eval (sets env vars in current shell)
+eval "$(flnx-keychain env)" && npm start
 ```
 
-The command after `--` runs with secrets available as environment variables.
+The `exec` command spawns a child process with secrets as env vars.
+The `env` command outputs export statements you can pipe to `eval`.
+
+**Example:**
+```bash
+cd /Users/pratiksha/work/flnx-autotrader
+eval "$(flnx-keychain env)" && uv run flnx-autotrader backtest COIN --days 5
+```
 
 ### Exit Codes
 
