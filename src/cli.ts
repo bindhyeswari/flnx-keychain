@@ -1,12 +1,13 @@
 #!/usr/bin/env bun
 import { parseArgs } from "util";
-import { setSecret, getSecret, deleteSecret, hasSecret } from "./keychain.ts";
+import { setSecret, getSecret, deleteSecret, hasSecret, authenticate } from "./keychain.ts";
 import {
   KeychainError,
   ItemNotFoundError,
   AuthFailedError,
   AuthCancelledError,
 } from "./errors.ts";
+import type { ExecConfig } from "./types.ts";
 
 const USAGE = `Usage: flnx-keychain <command> <service> [options]
 
@@ -15,11 +16,13 @@ Commands:
   get <service>     Retrieve a secret (prints to stdout)
   delete <service>  Remove a secret from the Keychain
   has <service>     Check if a secret exists
+  exec -- <cmd>     Run command with secrets as env vars
 
 Options:
   --account <name>   Keychain account label (default: "default")
   --biometric        Require Touch ID to access this item
   --reason <text>    Message shown in the Touch ID dialog
+  --config <path>    Config file for exec command (default: .keychain.json)
   --help             Show this help message`;
 
 function die(message: string, code: number): never {
@@ -64,6 +67,21 @@ async function promptSecret(): Promise<string> {
   });
 }
 
+async function loadExecConfig(path: string): Promise<ExecConfig> {
+  const file = Bun.file(path);
+  if (!(await file.exists())) {
+    die(`Config file not found: ${path}`, 3);
+  }
+  const config = await file.json();
+  if (typeof config.service !== "string" || !config.service) {
+    die("Invalid config: 'service' must be a non-empty string", 3);
+  }
+  if (typeof config.secrets !== "object" || config.secrets === null) {
+    die("Invalid config: 'secrets' must be an object", 3);
+  }
+  return config as ExecConfig;
+}
+
 async function main() {
   const args = process.argv.slice(2);
 
@@ -73,6 +91,65 @@ async function main() {
   }
 
   const command = args[0];
+
+  // exec command has special argument handling
+  if (command === "exec") {
+    const { values } = parseArgs({
+      args: args.slice(1),
+      options: {
+        config: { type: "string" },
+      },
+      strict: false,
+      allowPositionals: true,
+    });
+
+    const configPath = (values.config as string | undefined) ?? ".keychain.json";
+    const config = await loadExecConfig(configPath);
+
+    // Find "--" separator, everything after is the command
+    const dashIdx = args.indexOf("--");
+    if (dashIdx === -1 || dashIdx === args.length - 1) {
+      die("Usage: flnx-keychain exec [--config path] -- <command>", 3);
+    }
+    const cmd = args.slice(dashIdx + 1);
+
+    try {
+      // Biometric gate if configured
+      if (config.biometric) {
+        await authenticate(`Run: ${cmd.join(" ")}`);
+      }
+
+      // Fetch all secrets
+      const env: Record<string, string | undefined> = { ...process.env };
+      for (const [envVar, account] of Object.entries(config.secrets)) {
+        env[envVar] = await getSecret({
+          service: config.service,
+          account,
+        });
+      }
+
+      // Spawn child process
+      const child = Bun.spawn(cmd, {
+        env,
+        stdin: "inherit",
+        stdout: "inherit",
+        stderr: "inherit",
+      });
+
+      const code = await child.exited;
+      process.exit(code);
+    } catch (err) {
+      if (err instanceof ItemNotFoundError) {
+        die(err.message, 1);
+      } else if (err instanceof AuthFailedError || err instanceof AuthCancelledError) {
+        die(err.message, 2);
+      } else if (err instanceof KeychainError) {
+        die(err.message, 3);
+      }
+      throw err;
+    }
+  }
+
   const service = args[1];
 
   if (!service) {

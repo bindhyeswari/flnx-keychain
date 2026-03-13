@@ -106,6 +106,40 @@ flnx-keychain has com.myapp.token
 flnx-keychain delete com.myapp.token
 ```
 
+### Running Commands with Secrets (`exec`)
+
+Inject secrets as environment variables and run a command:
+
+**1. Create `.keychain.json` in your project:**
+```json
+{
+  "service": "myapp",
+  "biometric": true,
+  "secrets": {
+    "OPENAI_API_KEY": "openai-key",
+    "DATABASE_URL": "db-url"
+  }
+}
+```
+
+- `service`: Keychain service name (shared across all secrets)
+- `biometric`: Require Touch ID before accessing secrets (optional, default: false)
+- `secrets`: Map of `ENV_VAR_NAME` → keychain account name
+
+**2. Store secrets in keychain:**
+```bash
+echo "sk-abc123" | flnx-keychain set myapp --account openai-key
+echo "postgres://..." | flnx-keychain set myapp --account db-url
+```
+
+**3. Run with secrets injected:**
+```bash
+flnx-keychain exec -- npm start
+flnx-keychain exec --config ./other.keychain.json -- bun run dev
+```
+
+The command after `--` runs with secrets available as environment variables.
+
 ### Exit Codes
 
 | Code | Meaning |

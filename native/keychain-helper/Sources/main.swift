@@ -60,6 +60,11 @@ struct Args {
             i += 1
         }
 
+        // auth command doesn't require service
+        if command == "auth" {
+            return Args(command: command, service: "", account: account,
+                        biometric: biometric, biometricReason: biometricReason)
+        }
         guard let svc = service else { return nil }
         return Args(command: command, service: svc, account: account,
                     biometric: biometric, biometricReason: biometricReason)
@@ -263,6 +268,46 @@ func hasItem(args: Args) {
     }
 }
 
+func authenticate(args: Args) {
+    let context = LAContext()
+    var error: NSError?
+
+    guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
+        let msg = error?.localizedDescription ?? "Biometrics not available"
+        print(JSONResponse.error(code: "not_available", message: msg))
+        exit(3)
+    }
+
+    let semaphore = DispatchSemaphore(value: 0)
+    var authSuccess = false
+    var authError: Error?
+
+    context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
+                           localizedReason: args.biometricReason) { success, err in
+        authSuccess = success
+        authError = err
+        semaphore.signal()
+    }
+    semaphore.wait()
+
+    if authSuccess {
+        print(JSONResponse.success())
+    } else {
+        if let laError = authError as? LAError {
+            switch laError.code {
+            case .userCancel:
+                print(JSONResponse.error(code: "auth_cancelled", message: "User cancelled authentication"))
+                exit(2)
+            default:
+                print(JSONResponse.error(code: "auth_failed", message: "Authentication failed: \(laError.localizedDescription)"))
+                exit(2)
+            }
+        }
+        print(JSONResponse.error(code: "auth_failed", message: "Authentication failed"))
+        exit(2)
+    }
+}
+
 // MARK: - Main
 
 guard let args = Args.parse() else {
@@ -280,6 +325,8 @@ case "delete":
     deleteItem(args: args)
 case "has":
     hasItem(args: args)
+case "auth":
+    authenticate(args: args)
 default:
     print(JSONResponse.error(code: "keychain_error", message: "Unknown command: \(args.command)"))
     exit(3)

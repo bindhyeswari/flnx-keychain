@@ -19,3 +19,9 @@ export interface KeychainResult {
   error?: string;
   message?: string;
 }
+
+export interface ExecConfig {
+  service: string;
+  secrets: Record<string, string>; // ENV_VAR → account
+  biometric?: boolean; // Require Touch ID before accessing secrets
+}

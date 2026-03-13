@@ -140,3 +140,9 @@ export async function hasSecret(options: KeychainItemIdentifier): Promise<boolea
   const result = await exec(buildArgs("has", options));
   return result.exists!;
 }
+
+export async function authenticate(reason?: string): Promise<void> {
+  const args = ["auth"];
+  if (reason) args.push("--biometric-reason", reason);
+  await exec(args);
+}

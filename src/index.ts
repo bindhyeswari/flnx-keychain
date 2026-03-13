@@ -1,4 +1,4 @@
-export { setSecret, getSecret, deleteSecret, hasSecret } from "./keychain.ts";
+export { setSecret, getSecret, deleteSecret, hasSecret, authenticate } from "./keychain.ts";
 export {
   KeychainError,
   ItemNotFoundError,
