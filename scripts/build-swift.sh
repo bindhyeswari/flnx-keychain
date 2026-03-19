@@ -52,7 +52,12 @@ fi
 chmod +x "$BIN_DIR/keychain-helper"
 
 # Sign with entitlements for Keychain access
+# Without this, Keychain operations fail with OSStatus -34018
 echo "Signing with keychain entitlements..."
-codesign --force --sign - --entitlements "$ENTITLEMENTS" "$BIN_DIR/keychain-helper"
+if ! codesign --force --sign - --entitlements "$ENTITLEMENTS" "$BIN_DIR/keychain-helper"; then
+  echo "Error: codesign failed. Keychain operations will not work without entitlements (OSStatus -34018)." >&2
+  echo "Ensure Xcode command line tools are installed: xcode-select --install" >&2
+  exit 1
+fi
 
 echo "keychain-helper built successfully"

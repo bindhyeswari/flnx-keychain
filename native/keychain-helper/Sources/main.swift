@@ -147,7 +147,8 @@ func setItem(args: Args) {
     if status == errSecSuccess {
         print(JSONResponse.success())
     } else {
-        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)"))
+        let hint = status == -34018 ? " — binary is missing keychain entitlements. Reinstall the package or run: codesign --force --sign - --entitlements native/keychain-helper/keychain-helper.entitlements bin/keychain-helper" : ""
+        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)\(hint)"))
         exit(3)
     }
 }
@@ -221,7 +222,8 @@ func getItem(args: Args) {
         print(JSONResponse.error(code: "auth_cancelled", message: "User cancelled authentication"))
         exit(2)
     default:
-        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)"))
+        let hint = status == -34018 ? " — binary is missing keychain entitlements. Reinstall the package or run: codesign --force --sign - --entitlements native/keychain-helper/keychain-helper.entitlements bin/keychain-helper" : ""
+        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)\(hint)"))
         exit(3)
     }
 }
@@ -242,7 +244,8 @@ func deleteItem(args: Args) {
         print(JSONResponse.error(code: "item_not_found", message: "No keychain item found for service '\(args.service)' account '\(args.account)'"))
         exit(1)
     default:
-        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)"))
+        let hint = status == -34018 ? " — binary is missing keychain entitlements. Reinstall the package or run: codesign --force --sign - --entitlements native/keychain-helper/keychain-helper.entitlements bin/keychain-helper" : ""
+        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)\(hint)"))
         exit(3)
     }
 }
@@ -263,7 +266,8 @@ func hasItem(args: Args) {
     case errSecItemNotFound:
         print(JSONResponse.success(["exists": false]))
     default:
-        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)"))
+        let hint = status == -34018 ? " — binary is missing keychain entitlements. Reinstall the package or run: codesign --force --sign - --entitlements native/keychain-helper/keychain-helper.entitlements bin/keychain-helper" : ""
+        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)\(hint)"))
         exit(3)
     }
 }
