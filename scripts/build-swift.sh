@@ -17,6 +17,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 SWIFT_DIR="$PROJECT_ROOT/native/keychain-helper"
 BIN_DIR="$PROJECT_ROOT/bin"
+ENTITLEMENTS="$SWIFT_DIR/keychain-helper.entitlements"
 
 mkdir -p "$BIN_DIR"
 cd "$SWIFT_DIR"
@@ -49,4 +50,9 @@ else
 fi
 
 chmod +x "$BIN_DIR/keychain-helper"
+
+# Sign with entitlements for Keychain access
+echo "Signing with keychain entitlements..."
+codesign --force --sign - --entitlements "$ENTITLEMENTS" "$BIN_DIR/keychain-helper"
+
 echo "keychain-helper built successfully"
