@@ -3,3 +3,4 @@ dist/
 bin/keychain-helper
 .build/
 native/keychain-helper/.build/
+.npmrc

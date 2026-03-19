@@ -1,0 +1,10 @@
+native/keychain-helper/.build/
+node_modules/
+.git/
+.claude/
+.build/
+ARCHITECTURE.md
+CLAUDE.md
+TASKS.md
+tsconfig.json
+bun.lock
