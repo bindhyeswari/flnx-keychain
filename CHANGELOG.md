@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.4 (2026-03-20)
+
+### Fixed
+- Prompt Touch ID biometric confirmation on `set --biometric` (previously only configured ACL for reads without prompting on write)
+
 ## 0.2.3 (2026-03-20)
 
 ### Fixed

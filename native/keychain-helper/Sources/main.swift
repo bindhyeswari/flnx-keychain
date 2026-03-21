@@ -94,6 +94,45 @@ func setItem(args: Args) {
         exit(3)
     }
 
+    // Authenticate with Touch ID before storing, so the user confirms the write
+    if args.biometric {
+        let context = LAContext()
+        context.localizedReason = args.biometricReason
+
+        let semaphore = DispatchSemaphore(value: 0)
+        var authSuccess = false
+        var authError: Error?
+
+        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
+                               localizedReason: args.biometricReason) { success, error in
+            authSuccess = success
+            authError = error
+            semaphore.signal()
+        }
+        semaphore.wait()
+
+        if !authSuccess {
+            if let laError = authError as? LAError {
+                switch laError.code {
+                case .userCancel:
+                    print(JSONResponse.error(code: "auth_cancelled", message: "User cancelled authentication"))
+                    exit(2)
+                case .biometryNotAvailable:
+                    print(JSONResponse.error(code: "not_available", message: "Biometrics not available"))
+                    exit(3)
+                case .biometryNotEnrolled:
+                    print(JSONResponse.error(code: "not_available", message: "No biometrics enrolled"))
+                    exit(3)
+                default:
+                    print(JSONResponse.error(code: "auth_failed", message: "Authentication failed: \(laError.localizedDescription)"))
+                    exit(2)
+                }
+            }
+            print(JSONResponse.error(code: "auth_failed", message: "Authentication failed"))
+            exit(2)
+        }
+    }
+
     var query: [String: Any] = [
         kSecClass as String: kSecClassGenericPassword,
         kSecAttrService as String: args.service,
