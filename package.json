@@ -1,6 +1,6 @@
 {
   "name": "@mishrab/keychain",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "macOS Keychain access with Touch ID biometric confirmation",
   "type": "module",
   "main": "dist/index.js",
@@ -12,6 +12,7 @@
     "dist/",
     "native/keychain-helper/Package.swift",
     "native/keychain-helper/Sources/",
+    "native/keychain-helper/*.entitlements",
     "scripts/",
     "bin/"
   ],

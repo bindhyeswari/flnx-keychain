@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.2 (2026-03-20)
+
+### Fixed
+- Include entitlements files in published npm package, fixing `postinstall` codesign failure for consumers
+
 ## 0.2.0 (2026-03-19)
 
 ### Breaking
