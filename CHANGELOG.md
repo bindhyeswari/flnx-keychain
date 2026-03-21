@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.6 (2026-03-20)
+
+### Fixed
+- Fix process hang after biometric commands by adding explicit `exit(0)` to drain lingering LAContext dispatch queues
+
 ## 0.2.5 (2026-03-20)
 
 ### Fixed

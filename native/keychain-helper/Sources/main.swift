@@ -346,3 +346,6 @@ default:
     print(JSONResponse.error(code: "keychain_error", message: "Unknown command: \(args.command)"))
     exit(3)
 }
+
+// Explicit exit to avoid hanging on lingering LAContext dispatch queues
+exit(0)
