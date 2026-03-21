@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.3 (2026-03-20)
+
+### Fixed
+- Fix SIGKILL (exit code 137) on ad-hoc signed binaries by removing unresolvable `keychain-access-groups` entitlement with `$(AppIdentifierPrefix)` variable
+
 ## 0.2.2 (2026-03-20)
 
 ### Fixed
