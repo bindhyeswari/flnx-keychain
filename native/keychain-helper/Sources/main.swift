@@ -140,22 +140,9 @@ func setItem(args: Args) {
         kSecValueData as String: secretData,
     ]
 
-    if args.biometric {
-        var error: Unmanaged<CFError>?
-        guard let access = SecAccessControlCreateWithFlags(
-            nil,
-            kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-            .biometryCurrentSet,
-            &error
-        ) else {
-            let msg = error?.takeRetainedValue().localizedDescription ?? "Unknown error"
-            print(JSONResponse.error(code: "not_available", message: "Cannot create biometric access control: \(msg)"))
-            exit(3)
-        }
-        query[kSecAttrAccessControl as String] = access
-    } else {
-        query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-    }
+    // Biometric protection is enforced by explicit LAContext authentication above,
+    // not by keychain ACL flags (which require Apple Developer entitlements).
+    query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
 
     var status = SecItemAdd(query as CFDictionary, nil)
 
@@ -166,28 +153,16 @@ func setItem(args: Args) {
             kSecAttrService as String: args.service,
             kSecAttrAccount as String: args.account,
         ]
-        var updateAttrs: [String: Any] = [
+        let updateAttrs: [String: Any] = [
             kSecValueData as String: secretData,
         ]
-        if args.biometric {
-            var error: Unmanaged<CFError>?
-            if let access = SecAccessControlCreateWithFlags(
-                nil,
-                kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-                .biometryCurrentSet,
-                &error
-            ) {
-                updateAttrs[kSecAttrAccessControl as String] = access
-            }
-        }
         status = SecItemUpdate(searchQuery as CFDictionary, updateAttrs as CFDictionary)
     }
 
     if status == errSecSuccess {
         print(JSONResponse.success())
     } else {
-        let hint = status == -34018 ? " — binary is missing keychain entitlements. Reinstall the package or run: codesign --force --sign - --entitlements native/keychain-helper/keychain-helper.entitlements bin/keychain-helper" : ""
-        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)\(hint)"))
+        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)"))
         exit(3)
     }
 }
@@ -261,8 +236,7 @@ func getItem(args: Args) {
         print(JSONResponse.error(code: "auth_cancelled", message: "User cancelled authentication"))
         exit(2)
     default:
-        let hint = status == -34018 ? " — binary is missing keychain entitlements. Reinstall the package or run: codesign --force --sign - --entitlements native/keychain-helper/keychain-helper.entitlements bin/keychain-helper" : ""
-        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)\(hint)"))
+        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)"))
         exit(3)
     }
 }
@@ -283,8 +257,7 @@ func deleteItem(args: Args) {
         print(JSONResponse.error(code: "item_not_found", message: "No keychain item found for service '\(args.service)' account '\(args.account)'"))
         exit(1)
     default:
-        let hint = status == -34018 ? " — binary is missing keychain entitlements. Reinstall the package or run: codesign --force --sign - --entitlements native/keychain-helper/keychain-helper.entitlements bin/keychain-helper" : ""
-        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)\(hint)"))
+        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)"))
         exit(3)
     }
 }
@@ -305,8 +278,7 @@ func hasItem(args: Args) {
     case errSecItemNotFound:
         print(JSONResponse.success(["exists": false]))
     default:
-        let hint = status == -34018 ? " — binary is missing keychain entitlements. Reinstall the package or run: codesign --force --sign - --entitlements native/keychain-helper/keychain-helper.entitlements bin/keychain-helper" : ""
-        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)\(hint)"))
+        print(JSONResponse.error(code: "keychain_error", message: "Keychain error: OSStatus \(status)"))
         exit(3)
     }
 }

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.5 (2026-03-20)
+
+### Fixed
+- Fix OSStatus -34018 on `set --biometric` by replacing keychain-level biometric ACL (requires Apple Developer entitlements) with explicit Touch ID authentication via LAContext
+
 ## 0.2.4 (2026-03-20)
 
 ### Fixed
