@@ -1,6 +1,6 @@
 # @flnx/keychain
 
-NOTE: This project is under development and should not be used till the following issue is resolved. 
+## NOTE: This project is under development and should not be used till the following issue is resolved. 
 [SEP & flnx-keychain](https://github.com/bindhyeswari/flnx-keychain/issues/2)
 
 macOS Keychain access with Touch ID biometric confirmation. Store, retrieve, and manage secrets with optional biometric authentication.
